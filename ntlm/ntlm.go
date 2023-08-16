@@ -1,6 +1,6 @@
 //Copyright 2013 Thomson Reuters Global Resources. BSD License please see License file for more information
 
-// Package NTLM implements the interfaces used for interacting with NTLMv1 and NTLMv2.
+// Package ntlm implements the interfaces used for interacting with NTLMv1 and NTLMv2.
 // To create NTLM v1 or v2 sessions you would use CreateClientSession and create ClientServerSession.
 package ntlm
 
@@ -40,7 +40,7 @@ func CreateClientSession(version Version, mode Mode) (n ClientSession, err error
 }
 
 type ClientSession interface {
-	SetUserInfo(username string, password string, domain string)
+	SetUserInfo(username string, password string, domain string, workstation string)
 	SetMode(mode Mode)
 
 	GenerateNegotiateMessage() (*NegotiateMessage, error)
@@ -71,8 +71,8 @@ func CreateServerSession(version Version, mode Mode) (n ServerSession, err error
 }
 
 type ServerSession interface {
-	SetUserInfo(username string, password string, domain string)
-	GetUserInfo() (string, string, string)
+	SetUserInfo(username string, password string, domain string, workstation string)
+	GetUserInfo() (string, string, string, string)
 
 	SetMode(mode Mode)
 	SetServerChallenge(challenge []byte)
@@ -94,9 +94,10 @@ type ServerSession interface {
 type SessionData struct {
 	mode Mode
 
-	user       string
-	password   string
-	userDomain string
+	user        string
+	password    string
+	userDomain  string
+	workstation string
 
 	NegotiateFlags uint32
 

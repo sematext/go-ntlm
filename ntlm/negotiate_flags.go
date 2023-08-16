@@ -4,7 +4,7 @@ package ntlm
 
 // During NTLM authentication, each of the following flags is a possible value of the NegotiateFlags field of the NEGOTIATE_MESSAGE,
 // CHALLENGE_MESSAGE, and AUTHENTICATE_MESSAGE, unless otherwise noted. These flags define client or server NTLM capabilities
-// ssupported by the sender.
+// supported by the sender.
 
 import (
 	"bytes"

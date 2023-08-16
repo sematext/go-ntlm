@@ -14,18 +14,22 @@ import (
  Shared Session Data and Methods
 *******************************/
 
+// V1Session is the shared data and methods for NTLMv1
 type V1Session struct {
 	SessionData
 }
 
-func (n *V1Session) SetUserInfo(username string, password string, domain string) {
+// SetUserInfo sets the username, password, domain, and workstation for the session
+func (n *V1Session) SetUserInfo(username string, password string, domain string, workstation string) {
 	n.user = username
 	n.password = password
 	n.userDomain = domain
+	n.workstation = workstation
 }
 
-func (n *V1Session) GetUserInfo() (string, string, string) {
-	return n.user, n.password, n.userDomain
+// GetUserInfo returns the username, password, domain and workstation for the session
+func (n *V1Session) GetUserInfo() (string, string, string, string) {
+	return n.user, n.password, n.userDomain, n.workstation
 }
 
 func (n *V1Session) SetMode(mode Mode) {
@@ -331,7 +335,7 @@ func (n *V1ClientSession) GenerateAuthenticateMessage() (am *AuthenticateMessage
 	am.NtChallengeResponseFields, _ = CreateBytePayload(n.ntChallengeResponse)
 	am.DomainName, _ = CreateStringPayload(n.userDomain)
 	am.UserName, _ = CreateStringPayload(n.user)
-	am.Workstation, _ = CreateStringPayload("SQUAREMILL")
+	am.Workstation, _ = CreateStringPayload(n.workstation)
 	am.EncryptedRandomSessionKey, _ = CreateBytePayload(n.encryptedRandomSessionKey)
 	am.NegotiateFlags = n.NegotiateFlags
 	am.Version = &VersionStruct{ProductMajorVersion: uint8(6), ProductMinorVersion: uint8(1), ProductBuild: uint16(7601), NTLMRevisionCurrent: uint8(15)}
@@ -359,7 +363,7 @@ func ntowfv1(passwd string) []byte {
 	return md4(utf16FromString(passwd))
 }
 
-//	ConcatenationOf( DES( UpperCase( Passwd)[0..6],"KGS!@#$%"), DES( UpperCase( Passwd)[7..13],"KGS!@#$%"))
+// ConcatenationOf( DES( UpperCase( Passwd)[0..6],"KGS!@#$%"), DES( UpperCase( Passwd)[7..13],"KGS!@#$%"))
 func lmowfv1(passwd string) ([]byte, error) {
 	asciiPassword := []byte(strings.ToUpper(passwd))
 	keyBytes := zeroPaddedBytes(asciiPassword, 0, 14)
