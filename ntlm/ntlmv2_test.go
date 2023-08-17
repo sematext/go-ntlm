@@ -60,7 +60,7 @@ func TestNTLMv2(t *testing.T) {
 
 	// Challenge message
 	client := new(V2ClientSession)
-	client.SetUserInfo("User", "Password", "Domain")
+	client.SetUserInfo("User", "Password", "Domain", "")
 
 	challengeMessageBytes, _ := hex.DecodeString("4e544c4d53535000020000000c000c003800000033828ae20123456789abcdef00000000000000002400240044000000060070170000000f53006500720076006500720002000c0044006f006d00610069006e0001000c0053006500720076006500720000000000")
 	challengeMessage, err := ParseChallengeMessage(challengeMessageBytes)
@@ -76,7 +76,7 @@ func TestNTLMv2(t *testing.T) {
 	}
 
 	server := new(V2ServerSession)
-	server.SetUserInfo("User", "Password", "Domain")
+	server.SetUserInfo("User", "Password", "Domain", "")
 	server.serverChallenge = challengeMessage.ServerChallenge
 
 	// Authenticate message
@@ -123,7 +123,7 @@ func TestNTLMv2(t *testing.T) {
 
 	// Have the client process this server challenge message
 	client = new(V2ClientSession)
-	client.SetUserInfo("User", "Password", "Domain")
+	client.SetUserInfo("User", "Password", "Domain", "")
 	err = client.ProcessChallengeMessage(challenge)
 	if err != nil {
 		t.Errorf("Could not process server generated challenge message: %s", err)
@@ -162,7 +162,7 @@ func TestNTLMv2WithDomain(t *testing.T) {
 	authenticateMessage := "TlRMTVNTUAADAAAAGAAYALYAAADSANIAzgAAADQANABIAAAAIAAgAHwAAAAaABoAnAAAABAAEACgAQAAVYKQQgUCzg4AAAAPYQByAHIAYQB5ADEAMgAuAG0AcwBnAHQAcwB0AC4AcgBlAHUAdABlAHIAcwAuAGMAbwBtAHUAcwBlAHIAcwB0AHIAZQBzAHMAMQAwADAAMAAwADgATgBZAEMAVgBBADEAMgBTADIAQwBNAFMAQQBPYrLjU4h0YlWZeEoNvTJtBQMnnJuAeUwsP+vGmAHNRBpgZ+4ChQLqAQEAAAAAAACPFEIFjx7OAQUDJ5ybgHlMAAAAAAIADgBSAEUAVQBUAEUAUgBTAAEAHABVAEsAQgBQAC0AQwBCAFQAUgBNAEYARQAwADYABAAWAFIAZQB1AHQAZQByAHMALgBuAGUAdAADADQAdQBrAGIAcAAtAGMAYgB0AHIAbQBmAGUAMAA2AC4AUgBlAHUAdABlAHIAcwAuAG4AZQB0AAUAFgBSAGUAdQB0AGUAcgBzAC4AbgBlAHQAAAAAAAAAAAANuvnqD3K88ZpjkLleL0NW"
 
 	server := new(V2ServerSession)
-	server.SetUserInfo("blahblah", "Welcome1", "blahblah")
+	server.SetUserInfo("blahblah", "Welcome1", "blahblah", "")
 
 	authenticateData, _ := base64.StdEncoding.DecodeString(authenticateMessage)
 	a, _ := ParseAuthenticateMessage(authenticateData, 2)

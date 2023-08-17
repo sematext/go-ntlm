@@ -16,24 +16,30 @@ import (
  Shared Session Data and Methods
 *******************************/
 
+// V2Session is the shared session data and methods for NTLMv2
 type V2Session struct {
 	SessionData
 }
 
-func (n *V2Session) SetUserInfo(username string, password string, domain string) {
+// SetUserInfo sets the username, password, and domain for the session
+func (n *V2Session) SetUserInfo(username string, password string, domain string, workstation string) {
 	n.user = username
 	n.password = password
 	n.userDomain = domain
+	n.workstation = workstation
 }
 
-func (n *V2Session) GetUserInfo() (string, string, string) {
-	return n.user, n.password, n.userDomain
+// GetUserInfo returns the username, password, and domain for the session
+func (n *V2Session) GetUserInfo() (string, string, string, string) {
+	return n.user, n.password, n.userDomain, n.workstation
 }
 
+// SetMode sets the mode for the session
 func (n *V2Session) SetMode(mode Mode) {
 	n.mode = mode
 }
 
+// Version returns the NTLM version of the session
 func (n *V2Session) Version() int {
 	return 2
 }
@@ -46,6 +52,7 @@ func (n *V2Session) fetchResponseKeys() (err error) {
 	return
 }
 
+// GetSessionData returns the session data for the session
 func (n *V2ServerSession) GetSessionData() *SessionData {
 	return &n.SessionData
 }
@@ -175,11 +182,11 @@ func (n *V2ServerSession) GenerateChallengeMessage() (cm *ChallengeMessage, err 
 
 	// Create the AvPairs we need
 	pairs := new(AvPairs)
-	pairs.AddAvPair(MsvAvNbDomainName, utf16FromString("REUTERS"))
-	pairs.AddAvPair(MsvAvNbComputerName, utf16FromString("UKBP-CBTRMFE06"))
-	pairs.AddAvPair(MsvAvDnsDomainName, utf16FromString("Reuters.net"))
-	pairs.AddAvPair(MsvAvDnsComputerName, utf16FromString("ukbp-cbtrmfe06.Reuters.net"))
-	pairs.AddAvPair(MsvAvDnsTreeName, utf16FromString("Reuters.net"))
+	pairs.AddAvPair(MsvAvNbDomainName, utf16FromString("SEMATEXT"))
+	pairs.AddAvPair(MsvAvNbComputerName, utf16FromString("SYNTHETICS-HTTP-AGENT"))
+	pairs.AddAvPair(MsvAvDnsDomainName, utf16FromString("sematext.com"))
+	pairs.AddAvPair(MsvAvDnsComputerName, utf16FromString("synthetics-http-agent.sematext.com"))
+	pairs.AddAvPair(MsvAvDnsTreeName, utf16FromString("Sematext.com"))
 	pairs.AddAvPair(MsvAvEOL, make([]byte, 0))
 	cm.TargetInfo = pairs
 	cm.TargetInfoPayloadStruct, _ = CreateBytePayload(pairs.Bytes())
@@ -197,7 +204,8 @@ func (n *V2ServerSession) ProcessAuthenticateMessage(am *AuthenticateMessage) (e
 	// They should always be correct (I hope)
 	n.user = am.UserName.String()
 	n.userDomain = am.DomainName.String()
-	log.Printf("(ProcessAuthenticateMessage)NTLM v2 User %s Domain %s", n.user, n.userDomain)
+	n.workstation = am.Workstation.String()
+	log.Printf("(ProcessAuthenticateMessage)NTLM v2 User %s Domain %s Workstation %s", n.user, n.userDomain, n.workstation)
 
 	err = n.fetchResponseKeys()
 	if err != nil {
@@ -351,7 +359,7 @@ func (n *V2ClientSession) GenerateAuthenticateMessage() (am *AuthenticateMessage
 	am.NtChallengeResponseFields, _ = CreateBytePayload(n.ntChallengeResponse)
 	am.DomainName, _ = CreateStringPayload(n.userDomain)
 	am.UserName, _ = CreateStringPayload(n.user)
-	am.Workstation, _ = CreateStringPayload("SQUAREMILL")
+	am.Workstation, _ = CreateStringPayload(n.workstation)
 	am.EncryptedRandomSessionKey, _ = CreateBytePayload(n.encryptedRandomSessionKey)
 	am.NegotiateFlags = n.NegotiateFlags
 	am.Mic = make([]byte, 16)

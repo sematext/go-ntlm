@@ -1,3 +1,3 @@
-module github.com/vadimi/go-ntlm
+module github.com/sematext/go-ntlm
 
 go 1.13

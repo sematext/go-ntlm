@@ -58,7 +58,7 @@ func TestNtlmV1ExtendedSessionSecurity(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not create NTLMv1 session")
 	}
-	context.SetUserInfo("100001.wcp.thomsonreuters.com", "notmypass", "")
+	context.SetUserInfo("100001.wcp.thomsonreuters.com", "notmypass", "", "")
 	context.SetServerChallenge(c.ServerChallenge)
 	err = context.ProcessAuthenticateMessage(msg)
 	if err == nil {
@@ -81,7 +81,7 @@ func TestNtlmV1(t *testing.T) {
 	flags = NTLMSSP_NEGOTIATE_UNICODE.Set(flags)
 
 	n := new(V1ClientSession)
-	n.SetUserInfo("User", "Password", "Domain")
+	n.SetUserInfo("User", "Password", "Domain", "")
 	n.NegotiateFlags = flags
 	n.responseKeyNT, _ = hex.DecodeString("a4f49c406510bdcab6824ee7c30fd852")
 	n.responseKeyLM, _ = hex.DecodeString("e52cac67419a9a224a3b108f3fa6cb6d")
@@ -146,14 +146,14 @@ func TestNtlmV1(t *testing.T) {
 	}
 
 	client := new(V1ClientSession)
-	client.SetUserInfo("User", "Password", "Domain")
+	client.SetUserInfo("User", "Password", "Domain", "")
 	err = client.ProcessChallengeMessage(challengeMessage)
 	if err != nil {
 		t.Errorf("Could not process challenge message: %s", err)
 	}
 
 	server := new(V1ServerSession)
-	server.SetUserInfo("User", "Password", "Domain")
+	server.SetUserInfo("User", "Password", "Domain", "")
 	authenticateMessageBytes, err := hex.DecodeString("4e544c4d5353500003000000180018006c00000018001800840000000c000c00480000000800080054000000100010005c000000100010009c000000358280e20501280a0000000f44006f006d00610069006e00550073006500720043004f004d005000550054004500520098def7b87f88aa5dafe2df779688a172def11c7d5ccdef1367c43011f30298a2ad35ece64f16331c44bdbed927841f94518822b1b3f350c8958682ecbb3e3cb7")
 	authenticateMessage, err := ParseAuthenticateMessage(authenticateMessageBytes, 1)
 	if err == nil {
@@ -163,7 +163,7 @@ func TestNtlmV1(t *testing.T) {
 	}
 
 	server = new(V1ServerSession)
-	server.SetUserInfo("User", "Password", "Domain")
+	server.SetUserInfo("User", "Password", "Domain", "")
 	server.serverChallenge = challengeMessage.ServerChallenge
 
 	err = server.ProcessAuthenticateMessage(authenticateMessage)
@@ -212,14 +212,14 @@ func TestNTLMv1WithClientChallenge(t *testing.T) {
 	}
 
 	client := new(V1ClientSession)
-	client.SetUserInfo("User", "Password", "Domain")
+	client.SetUserInfo("User", "Password", "Domain", "")
 	err = client.ProcessChallengeMessage(challengeMessage)
 	if err != nil {
 		t.Errorf("Could not process challenge message: %s", err)
 	}
 
 	server := new(V1ServerSession)
-	server.SetUserInfo("User", "Password", "Domain")
+	server.SetUserInfo("User", "Password", "Domain", "")
 	server.serverChallenge = challengeMessage.ServerChallenge
 
 	authenticateMessageBytes, _ := hex.DecodeString("4e544c4d5353500003000000180018006c00000018001800840000000c000c00480000000800080054000000100010005c000000000000009c000000358208820501280a0000000f44006f006d00610069006e00550073006500720043004f004d0050005500540045005200aaaaaaaaaaaaaaaa000000000000000000000000000000007537f803ae367128ca458204bde7caf81e97ed2683267232")
